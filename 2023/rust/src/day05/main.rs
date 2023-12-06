@@ -1,10 +1,6 @@
-use std::io::BufRead;
+use crate::util::*;
 
 type Pair = (i64, i64);
-
-fn str_to_int_vec(string: &str) -> Vec<i64> {
-    string.split(' ').filter_map(|n| n.parse().ok()).collect()
-}
 
 pub fn split(
     (victim_first, victim_last): Pair,
@@ -46,7 +42,7 @@ fn parse_mappings(lines: impl Iterator<Item = String>) -> Vec<Vec<(i64, i64, i64
     let mut buffer = Vec::new();
 
     for line in lines {
-        match str_to_int_vec(&line).as_slice() {
+        match str_to_vec(&line).as_slice() {
             &[dst, src, len] => buffer.push((dst, src, len)),
             _ => {
                 mappings.push(buffer);
@@ -86,8 +82,8 @@ fn crunch(mappings: &[Vec<(i64, i64, i64)>], ranges: Vec<Pair>) -> Vec<Pair> {
 }
 
 pub fn main() {
-    let mut lines = std::io::stdin().lock().lines().map_while(Result::ok);
-    let initial = str_to_int_vec(&lines.next().unwrap()[7..]);
+    let mut lines = stdin_lines();
+    let initial = str_to_vec(&lines.next().unwrap()[7..]);
     let mappings = parse_mappings(lines);
 
     let mut parts = initial.clone().into_iter();
