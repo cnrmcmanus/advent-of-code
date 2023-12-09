@@ -1,4 +1,6 @@
 use std::io::BufRead;
+use std::iter::Iterator;
+use std::ops::Add;
 use std::str::FromStr;
 
 pub fn stdin_lines() -> impl Iterator<Item = String> {
@@ -7,4 +9,22 @@ pub fn stdin_lines() -> impl Iterator<Item = String> {
 
 pub fn str_to_vec<T: FromStr>(string: &str) -> Vec<T> {
     string.split(' ').filter_map(|n| n.parse().ok()).collect()
+}
+
+pub trait TupleSum<A, B>: Iterator {
+    fn sum_tuples(&mut self) -> (A, B);
+}
+
+impl<A, B, I> TupleSum<A, B> for I
+where
+    I: Iterator<Item = (A, B)>,
+    A: Add<Output = A> + Default,
+    B: Add<Output = B> + Default,
+{
+    fn sum_tuples(&mut self) -> (A, B) {
+        self.fold(
+            (Default::default(), Default::default()),
+            |(sum_a, sum_b), (a, b)| (sum_a + a, sum_b + b),
+        )
+    }
 }
