@@ -7,6 +7,24 @@ pub fn stdin_lines() -> impl Iterator<Item = String> {
     std::io::stdin().lock().lines().map_while(Result::ok)
 }
 
+pub fn line_chunks<I>(stream: I) -> Vec<Vec<String>>
+where
+    I: Iterator<Item = String>,
+{
+    let mut chunks = vec![];
+    let mut buffer = vec![];
+    for line in stream {
+        if line.is_empty() {
+            chunks.push(buffer);
+            buffer = vec![];
+        } else {
+            buffer.push(line);
+        }
+    }
+    chunks.push(buffer);
+    chunks
+}
+
 pub fn str_to_vec<T: FromStr>(string: &str) -> Vec<T> {
     let c = if string.contains(' ') { ' ' } else { ',' };
     string.split(c).filter_map(|n| n.parse().ok()).collect()
