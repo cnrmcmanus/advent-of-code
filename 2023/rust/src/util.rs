@@ -8,7 +8,8 @@ pub fn stdin_lines() -> impl Iterator<Item = String> {
 }
 
 pub fn str_to_vec<T: FromStr>(string: &str) -> Vec<T> {
-    string.split(' ').filter_map(|n| n.parse().ok()).collect()
+    let c = if string.contains(' ') { ' ' } else { ',' };
+    string.split(c).filter_map(|n| n.parse().ok()).collect()
 }
 
 pub trait TupleSum<A, B>: Iterator {
