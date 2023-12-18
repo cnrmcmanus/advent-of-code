@@ -7,6 +7,7 @@ mod day09;
 mod day11;
 mod day12;
 mod day13;
+mod day17;
 mod day18;
 mod util;
 
@@ -22,6 +23,7 @@ fn main() {
         "11" => day11::main(),
         "12" => day12::main(),
         "13" => day13::main(),
+        "17" => day17::main(),
         "18" => day18::main(),
         _ => {}
     }
