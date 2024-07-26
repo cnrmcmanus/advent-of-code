@@ -1,5 +1,6 @@
 mod day01;
 mod day02;
+mod day03;
 mod util;
 
 fn main() {
@@ -7,6 +8,7 @@ fn main() {
     match day.as_str() {
         "01" => day01::main(),
         "02" => day02::main(),
+        "03" => day03::main(),
         _ => {}
     }
 }
