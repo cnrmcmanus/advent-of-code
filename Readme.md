@@ -100,4 +100,4 @@ derive = takeWhile (not . all (== 0)) . iterate derivatives
 
 ### Math
 
-- [Day 06](/2023/haskell/day06.png)
+- [Day 06](/2023/math/day06.png)
