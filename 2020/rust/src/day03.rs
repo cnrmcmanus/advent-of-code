@@ -1,4 +1,4 @@
-use crate::util::*;
+use utils::*;
 
 fn descend(grid: &[Vec<char>], right: usize, down: usize) -> usize {
     let width = grid[0].len();

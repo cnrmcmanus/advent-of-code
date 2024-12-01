@@ -1,8 +1,7 @@
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::LazyLock;
-
-use crate::util::*;
+use utils::*;
 
 type Passport = HashMap<String, String>;
 type Validation = fn(&str) -> bool;

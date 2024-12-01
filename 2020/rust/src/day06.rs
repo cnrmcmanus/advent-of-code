@@ -1,6 +1,5 @@
 use std::collections::HashSet;
-
-use crate::util::*;
+use utils::*;
 
 pub fn main() {
     let groups: Vec<Vec<HashSet<char>>> = stdin_lines_by(r"(\r\n\r\n|\n\n)")

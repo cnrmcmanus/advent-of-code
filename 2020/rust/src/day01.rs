@@ -1,5 +1,5 @@
-use crate::util::*;
 use std::cmp::Ordering;
+use utils::*;
 
 fn find_pair_sum(numbers: &[u32], goal: u32) -> Option<u32> {
     for i in 0..numbers.len() {
