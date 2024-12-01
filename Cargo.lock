@@ -51,8 +51,16 @@ name = "rust-advent-2020"
 version = "0.1.0"
 dependencies = [
  "regex",
+ "utils",
 ]
 
 [[package]]
 name = "rust-advent-2023"
 version = "0.1.0"
+
+[[package]]
+name = "utils"
+version = "0.1.0"
+dependencies = [
+ "regex",
+]
