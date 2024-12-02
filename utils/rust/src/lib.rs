@@ -18,10 +18,16 @@ pub fn stdin_lines_by(pattern: &str) -> Vec<String> {
 
 pub trait StrExtensions {
     fn parse_ok<F: FromStr>(&self) -> Option<F>;
+
+    fn to_vec_by<T: FromStr>(&self, delim: &str) -> Vec<T>;
 }
 
 impl StrExtensions for str {
     fn parse_ok<F: FromStr>(&self) -> Option<F> {
         self.parse::<F>().ok()
+    }
+
+    fn to_vec_by<T: FromStr>(&self, delim: &str) -> Vec<T> {
+        self.split(delim).filter_map(|n| n.parse().ok()).collect()
     }
 }
