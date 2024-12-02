@@ -3,7 +3,7 @@ use utils::*;
 pub fn main() {
     let (mut col1, mut col2): (Vec<_>, Vec<_>) = stdin_lines()
         .filter_map(|line| {
-            let mut cols = line.split("   ").filter_map(str::parse_ok::<i32>);
+            let mut cols = line.split_and_parse::<i32>("   ");
             cols.next().zip(cols.next())
         })
         .unzip();
