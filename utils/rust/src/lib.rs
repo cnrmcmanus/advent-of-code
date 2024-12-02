@@ -1,5 +1,8 @@
 use regex::Regex;
-use std::{io::{BufRead, Read}, str::FromStr};
+use std::{
+    io::{BufRead, Read},
+    str::FromStr,
+};
 
 pub fn stdin_lines() -> impl Iterator<Item = String> {
     std::io::stdin().lock().lines().map_while(Result::ok)
@@ -19,7 +22,7 @@ pub fn stdin_lines_by(pattern: &str) -> Vec<String> {
 pub trait StrExtensions {
     fn parse_ok<F: FromStr>(&self) -> Option<F>;
 
-    fn to_vec_by<T: FromStr>(&self, delim: &str) -> Vec<T>;
+    fn split_and_parse<T: FromStr>(&self, delim: &str) -> impl Iterator<Item = T>;
 }
 
 impl StrExtensions for str {
@@ -27,7 +30,7 @@ impl StrExtensions for str {
         self.parse::<F>().ok()
     }
 
-    fn to_vec_by<T: FromStr>(&self, delim: &str) -> Vec<T> {
-        self.split(delim).filter_map(|n| n.parse().ok()).collect()
+    fn split_and_parse<T: FromStr>(&self, delim: &str) -> impl Iterator<Item = T> {
+        self.split(delim).filter_map(str::parse_ok)
     }
 }
