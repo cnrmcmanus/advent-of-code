@@ -19,6 +19,10 @@ pub fn stdin_lines_by(pattern: &str) -> Vec<String> {
     re.split(&stdin_all()).map(ToOwned::to_owned).collect()
 }
 
+pub fn regex(re: &str) -> Regex {
+    Regex::new(re).expect("failed to parse regex")
+}
+
 pub trait StrExtensions {
     fn parse_ok<F: FromStr>(&self) -> Option<F>;
 
