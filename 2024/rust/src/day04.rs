@@ -1,32 +1,29 @@
-use itertools::Itertools;
 use utils::*;
 
-fn xmas(matrix: &[Vec<char>], (i_step, j_step): (isize, isize)) -> u32 {
-    (0..matrix.len() as isize)
-        .cartesian_product(0..matrix[0].len() as isize)
-        .map(|(i, j)| {
-            u32::from(
-                (['X', 'M', 'A', 'S'].into_iter().enumerate()).all(|(offset, c)| {
-                    let i = i.wrapping_add(i_step * offset as isize) as usize;
-                    let j = j.wrapping_add(j_step * offset as isize) as usize;
-                    i < matrix.len() && j < matrix[0].len() && matrix[i][j] == c
-                }),
-            )
+fn xmas(matrix: &Matrix<char>, direction: Direction) -> u32 {
+    matrix
+        .indicies()
+        .map(|p| {
+            let end: String = (matrix.moves(p, direction, false).values())
+                .take(3)
+                .collect();
+            u32::from(matrix[p] == 'X' && end == "MAS")
         })
         .sum()
 }
 
-fn crossmas(matrix: &[Vec<char>]) -> u32 {
-    (1..matrix.len() - 1)
-        .cartesian_product(1..matrix[0].len() - 1)
-        .map(|(i, j)| {
-            let top_pair = (matrix[i - 1][j - 1], matrix[i - 1][j + 1]);
-            let bottom_pair = (matrix[i + 1][j - 1], matrix[i + 1][j + 1]);
-            let left_pair = (matrix[i - 1][j - 1], matrix[i + 1][j - 1]);
-            let right_pair = (matrix[i - 1][j + 1], matrix[i + 1][j + 1]);
+fn crossmas(matrix: &Matrix<char>) -> u32 {
+    matrix
+        .indicies()
+        .filter(|&p| !matrix.is_edge(p))
+        .map(|p| {
+            let top_pair = (matrix[p + UpLeft], matrix[p + UpRight]);
+            let bottom_pair = (matrix[p + DownLeft], matrix[p + DownRight]);
+            let left_pair = (matrix[p + UpLeft], matrix[p + DownLeft]);
+            let right_pair = (matrix[p + UpRight], matrix[p + DownRight]);
             let check = |pair_1, pair_2| pair_1 == ('S', 'S') && pair_2 == ('M', 'M');
             u32::from(
-                matrix[i][j] == 'A'
+                matrix[p] == 'A'
                     && (check(bottom_pair, top_pair)
                         || check(top_pair, bottom_pair)
                         || check(left_pair, right_pair)
@@ -37,14 +34,10 @@ fn crossmas(matrix: &[Vec<char>]) -> u32 {
 }
 
 pub fn main() {
-    let grid: Vec<Vec<char>> = stdin_lines().map(|line| line.chars().collect()).collect();
+    let matrix = Matrix::from_stdin();
 
-    let all_xmas: u32 = (-1..=1)
-        .cartesian_product(-1..=1)
-        .filter(|&step| step != (0, 0))
-        .map(|step| xmas(&grid, step))
-        .sum();
+    let all_xmas: u32 = DIRECTIONS.map(|step| xmas(&matrix, step)).iter().sum();
     println!("{}", all_xmas);
 
-    println!("{}", crossmas(&grid));
+    println!("{}", crossmas(&matrix));
 }
