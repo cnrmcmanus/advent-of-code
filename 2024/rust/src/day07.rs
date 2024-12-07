@@ -17,14 +17,12 @@ fn solvable(goal: u64, use_concat: bool, sub_total: u64, nums: &[u64]) -> bool {
 }
 
 pub fn main() {
-    let equations: Vec<(u64, Vec<u64>)> = stdin_lines()
-        .map(|line| {
-            let mut parts = line.split(": ");
-            let goal = parts.next().unwrap().parse().unwrap();
-            let nums = parts.next().unwrap().split_and_parse(" ").collect_vec();
-            (goal, nums)
-        })
-        .collect();
+    let equations: Vec<(u64, Vec<u64>)> = stdin(|line| {
+        let mut parts = line.split(": ");
+        let goal = parts.next().unwrap().parse().unwrap();
+        let nums = parts.next().unwrap().split_and_parse(" ").collect_vec();
+        (goal, nums)
+    });
 
     for use_concat in [false, true] {
         let total: u64 = equations

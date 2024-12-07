@@ -14,9 +14,7 @@ fn loose_safe(row: &[i32]) -> bool {
 }
 
 pub fn main() {
-    let grid: Vec<Vec<i32>> = stdin_lines()
-        .map(|line| line.split_and_parse(" ").collect())
-        .collect();
+    let grid: Vec<Vec<i32>> = stdin(|line| line.split_and_parse(" ").collect());
 
     let all_safe = grid.iter().filter(|row| safe(row, &[])).count();
     println!("{}", all_safe);
