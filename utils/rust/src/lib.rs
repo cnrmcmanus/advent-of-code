@@ -29,6 +29,14 @@ pub fn wrap(index: isize, max: usize) -> usize {
     (((index % max) + max) % max) as usize
 }
 
+pub fn magnitude(n: u64) -> u32 {
+    if n == 0 {
+        1
+    } else {
+        n.ilog10() + 1
+    }
+}
+
 pub trait StrExtensions {
     fn parse_ok<F: FromStr>(&self) -> Option<F>;
 
