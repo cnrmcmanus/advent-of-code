@@ -5,6 +5,10 @@ use std::{
     str::FromStr,
 };
 
+pub fn stdin<T, F: Fn(String) -> T>(f: F) -> Vec<T> {
+    stdin_lines().map(&f).collect()
+}
+
 pub fn stdin_lines() -> impl Iterator<Item = String> {
     std::io::stdin().lock().lines().map_while(Result::ok)
 }
