@@ -58,31 +58,42 @@ impl StrExtensions for str {
 }
 
 pub type Point = (usize, usize);
+pub type IPoint = (isize, isize);
 
 #[derive(Default)]
 pub struct Matrix<T> {
     pub data: Vec<Vec<T>>,
+    pub w: usize,
+    pub h: usize,
 }
 
 impl<T: PartialEq + Copy> Matrix<T> {
     pub fn new() -> Matrix<T> {
-        Matrix { data: Vec::new() }
+        Matrix {
+            data: Vec::new(),
+            w: 0,
+            h: 0,
+        }
     }
 
     pub fn from(data: Vec<Vec<T>>) -> Matrix<T> {
-        Matrix { data }
+        Matrix {
+            h: data.len(),
+            w: data.first().map_or(0, Vec::len),
+            data,
+        }
     }
 
-    pub fn dims(&self) -> (usize, usize) {
-        (
-            self.data.len(),
-            self.data.first().map_or_else(|| 0, Vec::len),
-        )
+    pub fn bounds(&self) -> Point {
+        (self.h, self.w)
     }
 
-    pub fn indicies(&self) -> impl Iterator<Item = (usize, usize)> {
-        let (h, w) = self.dims();
-        (0..h).cartesian_product(0..w)
+    pub fn indicies(&self) -> MatrixIterator<T> {
+        MatrixIterator {
+            matrix: self,
+            position: (0, 0),
+            movement: MatrixIteratorMovement::Increment,
+        }
     }
 
     pub fn map<U, F>(&self, f: F) -> Matrix<U>
@@ -96,13 +107,21 @@ impl<T: PartialEq + Copy> Matrix<T> {
         Matrix::from(data)
     }
 
-    pub fn moves(&self, from: (usize, usize), direction: Direction, wraps: bool) -> MatrixIterator {
+    pub fn moves(
+        &self,
+        from: Point,
+        direction: Direction,
+        wraps: bool,
+    ) -> MatrixIterator<T> {
         MatrixIterator {
+            matrix: self,
             position: from,
-            bounds: self.dims(),
-            direction,
-            wraps,
+            movement: MatrixIteratorMovement::Direction { direction, wraps },
         }
+    }
+
+    pub fn is_edge(&self, (i, j): Point) -> bool {
+        i == 0 || j == 0 || i == self.h - 1 || j == self.w - 1
     }
 
     pub fn position(&self, x: T) -> Option<(usize, usize)> {
@@ -126,6 +145,22 @@ impl Matrix<char> {
     }
 }
 
+impl<T> std::ops::Index<Point> for Matrix<T> {
+    type Output = T;
+
+    fn index(&self, (i, j): Point) -> &T {
+        &self.data[i][j]
+    }
+}
+
+impl<T> std::ops::Index<IPoint> for Matrix<T> {
+    type Output = T;
+
+    fn index(&self, (i, j): IPoint) -> &T {
+        &self.data[i as usize][j as usize]
+    }
+}
+
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Direction {
     Up,
@@ -140,7 +175,8 @@ pub enum Direction {
 
 pub use Direction::*;
 
-static DIRECTIONS: [Direction; 8] = [Up, UpRight, Right, DownRight, Down, DownLeft, Left, UpLeft];
+pub static DIRECTIONS: [Direction; 8] =
+    [Up, UpRight, Right, DownRight, Down, DownLeft, Left, UpLeft];
 
 impl Direction {
     pub fn rotate(&self, by: isize) -> Direction {
@@ -162,29 +198,87 @@ impl Direction {
     }
 }
 
-pub struct MatrixIterator {
-    position: (usize, usize),
-    bounds: (usize, usize),
-    direction: Direction,
-    wraps: bool,
+impl std::ops::Add<Point> for Direction {
+    type Output = Point;
+
+    fn add(self, (i, j): Point) -> Point {
+        let (o_i, o_j) = self.to_offset();
+        ((i as isize + o_i) as usize, (j as isize + o_j) as usize)
+    }
 }
 
-impl Iterator for MatrixIterator {
-    type Item = (usize, usize);
+impl std::ops::Add<Direction> for Point {
+    type Output = IPoint;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        let offset = self.direction.to_offset();
-        let i = self.position.0 as isize + offset.0;
-        let j = self.position.1 as isize + offset.1;
+    fn add(self, direction: Direction) -> IPoint {
+        let (i, j) = self;
+        let (o_i, o_j) = direction.to_offset();
+        ((i as isize + o_i), (j as isize + o_j))
+    }
+}
 
-        if !self.wraps
-            && (i < 0 || i >= self.bounds.0 as isize || j < 0 || j >= self.bounds.1 as isize)
-        {
-            return None;
+enum MatrixIteratorMovement {
+    Increment,
+    Direction { direction: Direction, wraps: bool },
+}
+
+pub struct MatrixIterator<'a, T> {
+    matrix: &'a Matrix<T>,
+    position: Point,
+    movement: MatrixIteratorMovement,
+}
+
+impl<'a, T> MatrixIterator<'a, T> {
+    pub fn values(self) -> MatrixIteratorValues<'a, T> {
+        MatrixIteratorValues {
+            matrix_iterator: self,
         }
+    }
+}
 
-        self.position = (wrap(i, self.bounds.0), wrap(j, self.bounds.1));
+impl<'a, T: Copy> Iterator for MatrixIterator<'a, T> {
+    type Item = Point;
+
+    fn next(&mut self) -> Option<Point> {
+        self.position = match self.movement {
+            MatrixIteratorMovement::Direction { direction, wraps } => {
+                let (i, j) = self.position + direction;
+                let out_bounds =
+                    i < 0 || i >= self.matrix.h as isize || j < 0 || j >= self.matrix.w as isize;
+                if !wraps && out_bounds {
+                    return None;
+                }
+                (wrap(i, self.matrix.h), wrap(j, self.matrix.w))
+            }
+            MatrixIteratorMovement::Increment => {
+                let row_end = self.position.0 == self.matrix.h - 1;
+                let column_end = self.position.1 == self.matrix.w - 1;
+                if row_end && column_end {
+                    return None;
+                }
+                if column_end {
+                    (self.position.0 + 1, 0)
+                } else {
+                    (self.position.0, self.position.1 + 1)
+                }
+            }
+        };
+
         Some(self.position)
+    }
+}
+
+pub struct MatrixIteratorValues<'a, T> {
+    matrix_iterator: MatrixIterator<'a, T>,
+}
+
+impl<'a, T: Copy> Iterator for MatrixIteratorValues<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.matrix_iterator
+            .next()
+            .map(|p| self.matrix_iterator.matrix[p])
     }
 }
 
