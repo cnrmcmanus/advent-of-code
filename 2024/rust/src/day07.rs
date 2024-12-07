@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use utils::*;
 
 fn solvable(goal: u64, use_concat: bool, sub_total: u64, nums: &[u64]) -> bool {

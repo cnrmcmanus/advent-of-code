@@ -1,9 +1,10 @@
-use itertools::Itertools;
 use regex::Regex;
 use std::{
     io::{BufRead, Read},
     str::FromStr,
 };
+
+pub use itertools::Itertools;
 
 pub fn stdin<T, F: Fn(String) -> T>(f: F) -> Vec<T> {
     stdin_lines().map(&f).collect()
