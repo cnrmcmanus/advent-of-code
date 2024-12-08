@@ -1,4 +1,5 @@
 mod matrix;
+mod point;
 
 use regex::Regex;
 use std::{
@@ -6,8 +7,11 @@ use std::{
     str::FromStr,
 };
 
-pub use itertools::Itertools;
+pub use itertools::{Either, Itertools};
+pub use std::collections::{HashMap, HashSet};
+
 pub use matrix::*;
+pub use point::*;
 
 pub fn stdin<T, F: Fn(String) -> T>(f: F) -> Vec<T> {
     stdin_lines().map(&f).collect()

@@ -8,16 +8,16 @@ pub fn run_patrol(matrix: &Matrix<char>, start: Point, visits: bool) -> (bool, H
     let mut collisions = HashSet::new();
     loop {
         let moves = matrix.moves(position, direction, false).collect_vec();
-        let pieces = moves.iter().map(|&(i, j)| matrix.data[i][j]).collect_vec();
 
-        if !pieces.contains(&'#') {
-            visits.then(|| visited.extend(moves.iter()));
+        if !moves.iter().any(|cell| cell.value == '#') {
+            visits.then(|| visited.extend(moves.iter().map(|cell| cell.index)));
             return (true, visited);
         }
 
-        let pieces = pieces.iter().take_while(|&&p| p != '#');
-        let moves = moves.into_iter().take(pieces.count()).collect_vec();
-        position = *moves.last().unwrap_or(&position);
+        let moves = (moves.iter())
+            .take_while(|cell| cell.value != '#')
+            .collect_vec();
+        position = moves.last().map_or(position, |cell| cell.index);
         let collision = (direction, position);
 
         if collisions.contains(&collision) {
@@ -26,7 +26,7 @@ pub fn run_patrol(matrix: &Matrix<char>, start: Point, visits: bool) -> (bool, H
 
         collisions.insert(collision);
         direction = direction.rotate(2);
-        visits.then(|| visited.extend(moves.iter()));
+        visits.then(|| visited.extend(moves.iter().map(|cell| cell.index)));
     }
 }
 
@@ -39,7 +39,7 @@ pub fn main() {
 
     let loops = (path.into_iter().filter(|&p| p != start))
         .map(|block| {
-            let matrix = matrix.map(|&x, p| if p == block { '#' } else { x });
+            let matrix = matrix.map_cell(block, |_| '#');
             u32::from(!run_patrol(&matrix, start, false).0)
         })
         .sum::<u32>();

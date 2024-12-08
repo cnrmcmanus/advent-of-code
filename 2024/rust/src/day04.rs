@@ -2,6 +2,7 @@ use utils::*;
 
 fn xmas(matrix: &Matrix<char>, direction: Direction) -> u32 {
     matrix
+        .iter()
         .indicies()
         .map(|p| {
             let end: String = (matrix.moves(p, direction, false).values())
@@ -14,6 +15,7 @@ fn xmas(matrix: &Matrix<char>, direction: Direction) -> u32 {
 
 fn crossmas(matrix: &Matrix<char>) -> u32 {
     matrix
+        .iter()
         .indicies()
         .filter(|&p| !matrix.is_edge(p))
         .map(|p| {
