@@ -7,6 +7,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
 
 fn main() {
     let day = std::env::args().nth(1).unwrap_or("0".to_string());
@@ -20,6 +21,7 @@ fn main() {
         "07" => day07::main(),
         "08" => day08::main(),
         "09" => day09::main(),
+        "10" => day10::main(),
         _ => {}
     }
 }
