@@ -74,7 +74,7 @@ impl<T: PartialEq + Copy> Matrix<T> {
         })
     }
 
-    pub fn moves(&self, from: Point, direction: Direction, wraps: bool) -> MatrixIterator<T> {
+    pub fn moves(&self, from: Point, direction: Point, wraps: bool) -> MatrixIterator<T> {
         MatrixIterator {
             matrix: self,
             position: from,
@@ -194,7 +194,7 @@ impl std::ops::Add<Direction> for Point {
 
 enum MatrixIteratorMovement {
     Increment,
-    Direction { direction: Direction, wraps: bool },
+    Direction { direction: Point, wraps: bool },
 }
 
 pub struct MatrixIterator<'a, T: PartialEq + Copy> {

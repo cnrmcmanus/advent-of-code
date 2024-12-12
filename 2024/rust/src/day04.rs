@@ -5,7 +5,7 @@ fn xmas(matrix: &Matrix<char>, direction: Direction) -> u32 {
         .iter()
         .indicies()
         .map(|p| {
-            let end: String = (matrix.moves(p, direction, false).values())
+            let end: String = (matrix.moves(p, direction.to_point(), false).values())
                 .take(3)
                 .collect();
             u32::from(matrix[p] == 'X' && end == "MAS")

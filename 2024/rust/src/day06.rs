@@ -7,7 +7,9 @@ pub fn run_patrol(matrix: &Matrix<char>, start: Point, visits: bool) -> (bool, H
     let mut visited = HashSet::from([position]);
     let mut collisions = HashSet::new();
     loop {
-        let moves = matrix.moves(position, direction, false).collect_vec();
+        let moves = matrix
+            .moves(position, direction.to_point(), false)
+            .collect_vec();
 
         if !moves.iter().any(|cell| cell.value == '#') {
             visits.then(|| visited.extend(moves.iter().map(|cell| cell.index)));
