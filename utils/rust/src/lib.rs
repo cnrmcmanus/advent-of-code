@@ -24,6 +24,13 @@ pub fn stdin_lines() -> impl Iterator<Item = String> {
 pub fn stdin_all() -> String {
     let mut contents = String::new();
     std::io::stdin().lock().read_to_string(&mut contents).ok();
+    while let Some(c) = contents.chars().last() {
+        if c.is_control() {
+            contents.pop();
+        } else {
+            break;
+        }
+    }
     contents
 }
 
@@ -64,3 +71,17 @@ impl StrExtensions for str {
         self.split(delim).filter_map(str::parse_ok)
     }
 }
+
+pub trait IteratorExtensions: Iterator {
+    fn map_sum<U, F>(self, mut f: F) -> U
+    where
+        Self: Sized,
+        U: Default + std::ops::Add<U, Output = U>,
+        F: FnMut(Self::Item) -> U,
+    {
+        let initial = U::default();
+        self.fold(initial, |sum, x| sum + f(x))
+    }
+}
+
+impl<T: Iterator> IteratorExtensions for T {}
