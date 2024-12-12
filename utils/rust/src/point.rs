@@ -61,7 +61,23 @@ op!(Add, add, Point, Point, |a: Point, b: Point| Point::new(
     a.i + b.i,
     a.j + b.j
 ));
+op!(Add, add, &Point, Point, |a: &Point, b: Point| Point::new(
+    a.i + b.i,
+    a.j + b.j
+));
+op!(Add, add, &Point, &Point, |a: &Point, b: &Point| Point::new(
+    a.i + b.i,
+    a.j + b.j
+));
 op!(Sub, sub, Point, Point, |a: Point, b: Point| Point::new(
+    a.i - b.i,
+    a.j - b.j
+));
+op!(Sub, sub, &Point, Point, |a: &Point, b: Point| Point::new(
+    a.i - b.i,
+    a.j - b.j
+));
+op!(Sub, sub, &Point, &Point, |a: &Point, b: &Point| Point::new(
     a.i - b.i,
     a.j - b.j
 ));
