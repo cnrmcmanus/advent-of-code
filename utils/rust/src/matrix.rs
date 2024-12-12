@@ -95,6 +95,12 @@ impl<T: PartialEq + Copy> Matrix<T> {
             .find(|cell| cell.value == x)
             .map(|cell| cell.index)
     }
+
+    pub fn positions(&self, x: T) -> impl Iterator<Item = Point> + '_ {
+        self.iter()
+            .filter(move |cell| cell.value == x)
+            .map(|cell| cell.index)
+    }
 }
 
 impl Matrix<char> {
