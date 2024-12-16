@@ -139,6 +139,12 @@ impl<T> std::ops::Index<&Point> for Matrix<T> {
     }
 }
 
+impl<T> std::ops::IndexMut<Point> for Matrix<T> {
+    fn index_mut(&mut self, p: Point) -> &mut T {
+        &mut self.data[p.i as usize][p.j as usize]
+    }
+}
+
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Direction {
     Up,
