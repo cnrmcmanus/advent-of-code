@@ -10,6 +10,8 @@ use std::{
 pub use itertools::{Either, Itertools};
 pub use std::collections::{HashMap, HashSet};
 
+pub use derive_new::new;
+
 pub use matrix::*;
 pub use point::*;
 
