@@ -317,7 +317,7 @@ mod tests {
         let matrix = matrix();
         assert_eq!(
             matrix
-                .moves(Point::new(1, 2), DownRight, false)
+                .moves(Point::new(1, 2), DownRight.to_point(), false)
                 .values()
                 .collect_vec(),
             vec![13, 19]
@@ -329,7 +329,7 @@ mod tests {
         let matrix = matrix();
         assert_eq!(
             matrix
-                .moves(Point::new(1, 2), DownRight, true)
+                .moves(Point::new(1, 2), DownRight.to_point(), true)
                 .values()
                 .take(4)
                 .collect_vec(),
