@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Matrix<T> {
     pub data: Vec<Vec<T>>,
     pub w: usize,
