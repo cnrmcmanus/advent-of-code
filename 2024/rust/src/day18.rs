@@ -1,10 +1,8 @@
 use utils::*;
 
 pub fn main() {
-    let bytes: Vec<Point> = stdin(|line| {
-        let parts = line.split_and_parse(",").collect_vec();
-        Point::new(parts[1], parts[0])
-    });
+    let bytes: Vec<Point> =
+        stdin(|line| Point::tuple(line.split_and_parse(",").collect_tuple().unwrap()));
     let mut m = Matrix::from(vec![vec!['.'; 71]; 71]);
     (0..1024).for_each(|i| m[bytes[i]] = '#');
 
@@ -13,7 +11,7 @@ pub fn main() {
     for i in 1024..bytes.len() {
         m[bytes[i]] = '#';
         if shortest(&m).is_none() {
-            println!("{},{}", bytes[i].j, bytes[i].i);
+            println!("{},{}", bytes[i].i, bytes[i].j);
             break;
         }
     }

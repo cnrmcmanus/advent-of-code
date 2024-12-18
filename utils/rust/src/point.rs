@@ -12,6 +12,10 @@ impl Point {
         Point { i, j }
     }
 
+    pub fn tuple((i, j): (isize, isize)) -> Point {
+        Point::new(i, j)
+    }
+
     pub fn origin() -> Point {
         Point::new(0, 0)
     }
