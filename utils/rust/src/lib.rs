@@ -12,6 +12,7 @@ pub use std::collections::{HashMap, HashSet};
 pub use std::cmp::{Ordering, Reverse};
 
 pub use derive_new::new;
+pub use memoize::memoize;
 
 pub use matrix::*;
 pub use point::*;
