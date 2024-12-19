@@ -77,14 +77,29 @@ impl StrExtensions for str {
 }
 
 pub trait IteratorExtensions: Iterator {
-    fn map_sum<U, F>(self, mut f: F) -> U
+    fn map_sum<T, F>(self, mut f: F) -> T
     where
         Self: Sized,
-        U: Default + std::ops::Add<U, Output = U>,
-        F: FnMut(Self::Item) -> U,
+        T: Default + std::ops::Add<T, Output = T>,
+        F: FnMut(Self::Item) -> T,
     {
-        let initial = U::default();
+        let initial = T::default();
         self.fold(initial, |sum, x| sum + f(x))
+    }
+
+    fn map_sum_tuple<T, U, F>(self, mut f: F) -> (T, U)
+    where
+        Self: Sized,
+        T: Default + std::ops::Add<T, Output = T>,
+        U: Default + std::ops::Add<U, Output = U>,
+        F: FnMut(Self::Item) -> (T, U),
+    {
+        let initial_t = T::default();
+        let initial_u = U::default();
+        self.fold((initial_t, initial_u), |(sum_t, sum_u), x| {
+            let (t, u) = f(x);
+            (sum_t + t, sum_u + u)
+        })
     }
 }
 
