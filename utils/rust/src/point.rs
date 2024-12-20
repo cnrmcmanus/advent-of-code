@@ -41,11 +41,22 @@ impl Point {
         self / d
     }
 
+    pub fn abs_distance(&self, other: Point) -> usize {
+        ((other.i - self.i).abs() + (other.j - self.j).abs()) as usize
+    }
+
     pub fn within(&self, top_left: Point, bottom_right: Point) -> bool {
         self.i >= top_left.i
             && self.i <= bottom_right.i
             && self.j >= top_left.j
             && self.j <= bottom_right.j
+    }
+
+    pub fn iter_within(self, distance: usize) -> impl Iterator<Item = Point> {
+        let distance = distance as isize;
+        (-distance..=distance)
+            .flat_map(move |di| (-distance..=distance).map(move |dj| self + Point::new(di, dj)))
+            .filter(move |&p| self.abs_distance(p) <= distance as usize)
     }
 }
 

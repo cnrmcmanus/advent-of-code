@@ -42,6 +42,40 @@ impl<T: PartialEq + Copy> Matrix<T> {
         }
     }
 
+    pub fn iter_within(&self, center: Point, distance: usize) -> MatrixIterator<T> {
+        let iter = center
+            .iter_within(distance)
+            .filter(move |&p| self.in_bounds(p));
+        MatrixIterator {
+            matrix: self,
+            position: Point::origin(),
+            movement: MatrixIteratorMovement::Iterator {
+                iter: Box::new(iter),
+            },
+        }
+    }
+
+    pub fn iter_within_by<'a, F>(
+        &'a self,
+        center: Point,
+        distance: usize,
+        f: F,
+    ) -> MatrixIterator<'a, T>
+    where
+        F: Fn(Cell<T>) -> bool + 'a,
+    {
+        let iter = center
+            .iter_within(distance)
+            .filter(move |&p| self.in_bounds(p) && f(Cell::new(p, self[p])));
+        MatrixIterator {
+            matrix: self,
+            position: Point::origin(),
+            movement: MatrixIteratorMovement::Iterator {
+                iter: Box::new(iter),
+            },
+        }
+    }
+
     pub fn map<U, F>(&self, f: F) -> Matrix<U>
     where
         U: PartialEq + Copy,
@@ -154,9 +188,15 @@ impl Matrix<char> {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct Cell<T: Copy + Clone> {
+pub struct Cell<T: Copy> {
     pub index: Point,
     pub value: T,
+}
+
+impl<T: Copy> Cell<T> {
+    pub fn new(index: Point, value: T) -> Cell<T> {
+        Cell { index, value }
+    }
 }
 
 impl<T> std::ops::Index<Point> for Matrix<T> {
@@ -234,15 +274,21 @@ impl std::ops::Add<Direction> for Point {
     }
 }
 
-enum MatrixIteratorMovement {
+enum MatrixIteratorMovement<'a> {
     Increment,
-    Direction { direction: Point, wraps: bool },
+    Direction {
+        direction: Point,
+        wraps: bool,
+    },
+    Iterator {
+        iter: Box<dyn Iterator<Item = Point> + 'a>,
+    },
 }
 
 pub struct MatrixIterator<'a, T: PartialEq + Copy> {
     matrix: &'a Matrix<T>,
     position: Point,
-    movement: MatrixIteratorMovement,
+    movement: MatrixIteratorMovement<'a>,
 }
 
 impl<'a, T: PartialEq + Copy> MatrixIterator<'a, T> {
@@ -263,10 +309,10 @@ impl<'a, T: PartialEq + Copy> Iterator for MatrixIterator<'a, T> {
     type Item = Cell<T>;
 
     fn next(&mut self) -> Option<Cell<T>> {
-        self.position = match self.movement {
+        self.position = match &mut self.movement {
             MatrixIteratorMovement::Direction { direction, wraps } => {
-                let p = self.position + direction;
-                if !wraps && !self.matrix.in_bounds(p) {
+                let p = self.position + *direction;
+                if !*wraps && !self.matrix.in_bounds(p) {
                     return None;
                 }
                 Point::from((wrap(p.i, self.matrix.h), wrap(p.j, self.matrix.w)))
@@ -282,6 +328,13 @@ impl<'a, T: PartialEq + Copy> Iterator for MatrixIterator<'a, T> {
                 } else {
                     (self.position.i, self.position.j + 1)
                 })
+            }
+            MatrixIteratorMovement::Iterator { iter } => {
+                let point = iter.next()?;
+                if !self.matrix.in_bounds(point) {
+                    return None;
+                }
+                point
             }
         };
 
