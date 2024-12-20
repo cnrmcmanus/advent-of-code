@@ -136,6 +136,15 @@ impl<T: PartialEq + Copy> Matrix<T> {
             .map(|cell| cell.index)
     }
 
+    pub fn positions_by<'a, F>(&'a self, f: F) -> impl Iterator<Item = Point> + 'a
+    where
+        F: Fn(T) -> bool + 'a,
+    {
+        self.iter()
+            .filter(move |cell| f(cell.value))
+            .map(|cell| cell.index)
+    }
+
     pub fn all_lowest_costs(&self, dest: Point, wall: T) -> HashMap<Point, usize> {
         self.all_lowest_costs_by(dest, |to_cell, _, _| to_cell.value != wall)
     }
