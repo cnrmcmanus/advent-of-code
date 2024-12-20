@@ -101,6 +101,42 @@ impl<T: PartialEq + Copy> Matrix<T> {
             .filter(move |cell| cell.value == x)
             .map(|cell| cell.index)
     }
+
+    pub fn all_lowest_costs(&self, dest: Point, wall: T) -> HashMap<Point, usize> {
+        self.all_lowest_costs_by(dest, |to_cell, _, _| to_cell.value != wall)
+    }
+
+    pub fn all_lowest_costs_by<F>(&self, dest: Point, f: F) -> HashMap<Point, usize>
+    where
+        F: Fn(Cell<T>, Cell<T>, Direction) -> bool,
+    {
+        let mut shortest = HashMap::new();
+        let mut steps = HashSet::from([dest]);
+        let mut n = 0;
+        while !steps.is_empty() {
+            let mut next_steps = HashSet::new();
+            for step in steps {
+                shortest.insert(step, n);
+                for dir in [Up, Down, Left, Right] {
+                    let next = step + dir;
+                    let from_cell = Cell {
+                        value: self[step],
+                        index: step,
+                    };
+                    let to_cell = Cell {
+                        value: self[next],
+                        index: next,
+                    };
+                    if f(to_cell, from_cell, dir) && !shortest.contains_key(&next) {
+                        next_steps.insert(next);
+                    }
+                }
+            }
+            steps = next_steps;
+            n += 1;
+        }
+        shortest
+    }
 }
 
 impl Matrix<char> {
