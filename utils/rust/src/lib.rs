@@ -8,8 +8,8 @@ use std::{
 };
 
 pub use itertools::{Either, Itertools};
-pub use std::collections::{HashMap, HashSet};
 pub use std::cmp::{Ordering, Reverse};
+pub use std::collections::{HashMap, HashSet};
 
 pub use derive_new::new;
 pub use memoize::memoize;
@@ -106,15 +106,23 @@ pub trait IteratorExtensions: Iterator {
 impl<T: Iterator> IteratorExtensions for T {}
 
 pub trait VecExtensions<T> {
-    fn sorted_insert_by<F>(&mut self, a: T, cmp: F) where F: Fn(&T, &T) -> Ordering;
+    fn sorted_insert_by<F>(&mut self, a: T, cmp: F)
+    where
+        F: Fn(&T, &T) -> Ordering;
 
-    fn sorted_insert_by_key<U: Ord, F>(&mut self, a: T, key: F) where F: Fn(&T) -> U {
+    fn sorted_insert_by_key<U: Ord, F>(&mut self, a: T, key: F)
+    where
+        F: Fn(&T) -> U,
+    {
         self.sorted_insert_by(a, |a, b| key(a).cmp(&key(b)));
     }
 }
 
 impl<T> VecExtensions<T> for Vec<T> {
-    fn sorted_insert_by<F>(&mut self, a: T, cmp: F) where F: Fn(&T, &T) -> Ordering {
+    fn sorted_insert_by<F>(&mut self, a: T, cmp: F)
+    where
+        F: Fn(&T, &T) -> Ordering,
+    {
         let i = self.binary_search_by(|b| cmp(&a, b)).unwrap_or_else(|i| i);
         self.insert(i, a);
     }
