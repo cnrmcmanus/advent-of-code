@@ -10,6 +10,9 @@ use std::{
 pub use itertools::{Either, Itertools};
 pub use std::cmp::{Ordering, Reverse};
 pub use std::collections::{HashMap, HashSet};
+pub use std::hash::Hash;
+pub use std::iter::{successors, once, repeat};
+pub use std::ops::BitXor;
 
 pub use derive_new::new;
 pub use memoize::memoize;
