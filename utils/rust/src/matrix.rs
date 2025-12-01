@@ -314,7 +314,7 @@ impl<'a, T: PartialEq + Copy> MatrixIterator<'a, T> {
     }
 }
 
-impl<'a, T: PartialEq + Copy> Iterator for MatrixIterator<'a, T> {
+impl<T: PartialEq + Copy> Iterator for MatrixIterator<'_, T> {
     type Item = Cell<T>;
 
     fn next(&mut self) -> Option<Cell<T>> {
@@ -358,7 +358,7 @@ pub struct MatrixIteratorValues<'a, T: PartialEq + Copy> {
     matrix_iterator: MatrixIterator<'a, T>,
 }
 
-impl<'a, T: PartialEq + Copy> Iterator for MatrixIteratorValues<'a, T> {
+impl<T: PartialEq + Copy> Iterator for MatrixIteratorValues<'_, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -372,7 +372,7 @@ pub struct MatrixIteratorIndicies<'a, T: PartialEq + Copy> {
     matrix_iterator: MatrixIterator<'a, T>,
 }
 
-impl<'a, T: PartialEq + Copy> Iterator for MatrixIteratorIndicies<'a, T> {
+impl<T: PartialEq + Copy> Iterator for MatrixIteratorIndicies<'_, T> {
     type Item = Point;
 
     fn next(&mut self) -> Option<Point> {
